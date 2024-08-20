@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>縦方向に回転するルーレット</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+<body>
+  <h1>縦方向に回転するルーレット</h1>
+  <button id="spinButton">ルーレットを回す</button>
+  
+  <script>
+    let angle = 0; // ルーレットの現在の角度（縦方向で回転）
+    let spin = 0; // ルーレットの回転速度
+    let spinning = false; // ルーレットが回転しているかのフラグ
+
+    function setup() {
+      createCanvas(400, 400);
+      angleMode(DEGREES);
+      let spinButton = select('#spinButton'); // HTMLのボタンを取得
+      spinButton.mousePressed(startSpinning);
+    }
+
+    function draw() {
+      background(220);
+      translate(width / 2, height / 2); // 描画の中心をキャンバスの中心に移動
+      drawRoulette();
+      drawNeedle();
+      if (spinning) {
+        spin *= 0.99; // 徐々に減速
+        angle += spin;
+        // 停止判定
+        if (spin < 0.1) {
+          spinning = false; // 停止
+          spin = 0;
+        }
+      }
+    }
+
+    function drawRoulette() {
+      let segments = 5; // セグメントの数を5に設定
+      let colors = [color('red'), color('blue'), color('green'), color('yellow'), color('purple')]; // セグメントごとの色を設定
+      let segmentHeight = 100; // 各セグメントの高さを設定
+
+      // angle をセグメントの高さの範囲で調整して、1の次に5が続くようにする
+      let offset = angle % (segments * segmentHeight);
+
+      // 6つ描画して、1の次に5が続くループを作る
+      for (let i = -1; i < segments + 1; i++) {
+        let actualSegment = (i + segments) % segments; // セグメントをループさせる
+        let yOffset = (i * segmentHeight) - offset;
+        fill(colors[actualSegment]);
+        rect(-150, yOffset - segmentHeight / 2, 300, segmentHeight); // 縦方向の長方形を描画
+
+        // テキストの描画
+        fill(0); // 数字の色を黒に設定
+        textSize(24); // テキストサイズを設定
+        textAlign(CENTER, CENTER);
+        text(actualSegment + 1, 0, yOffset);
+      }
+    }
+
+    function drawNeedle() {
+      strokeWeight(2);
+      stroke(0);
+      line(-160, 0, -150, 0); // 左側に針を描画
+    }
+
+    function startSpinning() {
+      if (!spinning) { // 既に回転中でない場合のみ
+        spin = random(5, 10); // 初速をランダムに設定
+        spinning = true;
+      }
+    }
+  </script>
+</body>
+</html>
